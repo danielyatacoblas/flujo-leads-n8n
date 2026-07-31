@@ -1,0 +1,35 @@
+# n8n self-hosted para desarrollo local — 100 % gratis, sin límite de operaciones.
+#
+#   docker compose up -d       → http://localhost:5678
+#   docker compose logs -f     → ver ejecuciones en vivo
+#   docker compose down        → apagar (los datos quedan en el volumen)
+#
+# Los workflows se guardan en el volumen n8n_data (persisten entre reinicios).
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: club_stem_n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # Zona horaria: los triggers programados usan esta referencia
+      - GENERIC_TIMEZONE=America/Lima
+      - TZ=America/Lima
+      # URL pública usada al construir las URLs de webhook
+      - WEBHOOK_URL=http://localhost:5678/
+      # Autenticación básica del panel (cámbiala antes de exponer a internet)
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=club-stem-demo
+      # Silencia el aviso de permisos de archivos de configuración
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_RUNNERS_ENABLED=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+      # Carpeta compartida para importar/exportar workflows desde el repo
+      - ./workflows:/workflows
+
+volumes:
+  n8n_data:
