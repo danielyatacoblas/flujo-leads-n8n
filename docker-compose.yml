@@ -19,10 +19,10 @@ services:
       - TZ=America/Lima
       # URL pública usada al construir las URLs de webhook
       - WEBHOOK_URL=http://localhost:5678/
-      # Autenticación básica del panel (cámbiala antes de exponer a internet)
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=club-stem-demo
+      # n8n 1.x usa gestión de usuarios interna: al abrirlo por primera vez
+      # se crea la cuenta de propietario desde la propia interfaz.
+      # (Las variables N8N_BASIC_AUTH_* fueron eliminadas en n8n 1.0.)
+      - N8N_DIAGNOSTICS_ENABLED=false
       # Silencia el aviso de permisos de archivos de configuración
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_RUNNERS_ENABLED=true
