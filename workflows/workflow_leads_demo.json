@@ -1,0 +1,348 @@
+{
+  "name": "Club STEM · Leads (DEMO sin credenciales)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-demo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-01",
+      "name": "Webhook · Nuevo lead",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        300
+      ],
+      "webhookId": "club-stem-lead-demo"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Nodo Code de n8n — \"Procesar lead\"\n// Espejo en JavaScript de src/flujo_leads.py (misma lógica, misma salida).\n// La paridad entre ambos está cubierta por tests/test_paridad_js.py.\n// Se inyecta en el workflow con: python scripts/build_workflow.py\n//\n// El CRM demo vive en workflowStaticData para que el flujo funcione SIN\n// credenciales de Google Sheets (en producción lo reemplaza el nodo Sheets).\n\nconst KEYWORDS = {\n  donacion: ['donar', 'donacion', 'aporte', 'auspicio', 'sponsor', 'empresa', 'rse'],\n  voluntariado: ['voluntari', 'ayudar', 'ensenar', 'mentor', 'apoyar'],\n  talleres: ['taller', 'clase', 'curso', 'robot', 'program', 'stem', 'inscri', 'hij', 'alumn'],\n};\n\nconst BIENVENIDA = {\n  talleres: '¡Hola {nombre}! Gracias por tu interés en los talleres STEM del Club. Aquí tienes el calendario del mes y el enlace de inscripción.',\n  voluntariado: '¡Hola {nombre}! Nos alegra que quieras ser voluntario/a. Te contamos cómo funciona el programa y los próximos onboarding.',\n  donacion: 'Hola {nombre}, gracias por querer apoyar al Club STEM. Te compartimos las formas de aportar y el impacto de cada una.',\n  general: '¡Hola {nombre}! Gracias por escribirnos al Club STEM. Un miembro del equipo te contactará muy pronto.',\n};\n\n// Quita tildes/diéresis para que la segmentación no dependa de cómo escriban.\n// Se usa el rango de marcas diacríticas combinantes en escapes Unicode\n// (evita caracteres invisibles en el código fuente).\nconst sinTildes = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');\n\nconst titleCase = (s) =>\n  s.split(/\\s+/).filter(Boolean)\n    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())\n    .join(' ');\n\n// ── Nodo 1: normalizar ──\nfunction normalizarLead(crudo) {\n  const nombre = titleCase(String(crudo.nombre || '').trim());\n  const email = String(crudo.email || '').trim().toLowerCase();\n  let telefono = String(crudo.telefono || '').replace(/[^\\d+]/g, '');\n  if (telefono.startsWith('+51')) {\n    // ya está en formato E.164\n  } else if (telefono.startsWith('51') && telefono.length === 11) {\n    telefono = '+' + telefono;\n  } else if (telefono.length === 9) {\n    telefono = '+51' + telefono;\n  }\n  return {\n    nombre,\n    email,\n    telefono,\n    mensaje: String(crudo.mensaje || '').replace(/\\s+/g, ' ').trim(),\n    canal: String(crudo.canal || 'web').trim().toLowerCase() || 'web',\n    fecha: crudo.fecha || new Date().toISOString().slice(0, 19),\n  };\n}\n\n// ── Nodo 2: validar ──\nfunction validarLead(lead) {\n  if (!lead.nombre) return { ok: false, motivo: 'sin nombre' };\n  const emailOk = /^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$/.test(lead.email);\n  const telOk = /^\\+51\\d{9}$/.test(lead.telefono);\n  if (!emailOk && !telOk) {\n    return { ok: false, motivo: 'sin email ni teléfono válidos' };\n  }\n  return { ok: true, motivo: 'ok' };\n}\n\n// ── Nodo 3: deduplicar ──\nfunction esDuplicado(lead, crm) {\n  return crm.some((f) =>\n    (lead.email && lead.email === f.email) ||\n    (lead.telefono && lead.telefono === f.telefono));\n}\n\n// ── Nodo 4: segmentar ──\nfunction segmentar(lead) {\n  const texto = sinTildes((lead.mensaje || '').toLowerCase());\n  for (const seg of ['donacion', 'voluntariado', 'talleres']) {\n    if (KEYWORDS[seg].some((k) => texto.includes(k))) return seg;\n  }\n  return 'general';\n}\n\n// ── Ejecución ──\nconst store = $getWorkflowStaticData('global');\nif (!Array.isArray(store.crm)) store.crm = [];\n\nconst salida = [];\n\nfor (const item of $input.all()) {\n  const crudo = item.json.body || item.json;   // el webhook entrega el payload en .body\n  const lead = normalizarLead(crudo);\n\n  const v = validarLead(lead);\n  if (!v.ok) {\n    salida.push({ json: { resultado: 'invalido', motivo: v.motivo, lead } });\n    continue;\n  }\n\n  if (esDuplicado(lead, store.crm)) {\n    salida.push({ json: { resultado: 'duplicado', lead } });\n    continue;\n  }\n\n  const segmento = segmentar(lead);\n  const filaCrm = Object.assign({}, lead, { segmento, estado: 'nuevo' });\n  store.crm.push(filaCrm);\n\n  salida.push({\n    json: {\n      resultado: 'nuevo',\n      segmento,\n      lead,\n      crm_fila: filaCrm,\n      crm_total: store.crm.length,\n      newsletter: {\n        email: lead.email,\n        tag: segmento,\n        accion: lead.email ? 'suscribir' : 'omitir',\n      },\n      email_bienvenida: BIENVENIDA[segmento].replace('{nombre}', lead.nombre.split(' ')[0]),\n      notificacion_equipo:\n        '🔔 Nuevo lead [' + segmento + '] ' + lead.nombre +\n        ' (' + lead.canal + ') — ' + (lead.email || lead.telefono),\n    },\n  });\n}\n\nreturn salida;\n"
+      },
+      "id": "code-01",
+      "name": "Procesar lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.segmento }}",
+                    "rightValue": "talleres",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "talleres"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c2",
+                    "leftValue": "={{ $json.segmento }}",
+                    "rightValue": "voluntariado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voluntariado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c3",
+                    "leftValue": "={{ $json.segmento }}",
+                    "rightValue": "donacion",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "donacion"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "otros"
+        }
+      },
+      "id": "sw-01",
+      "name": "Enrutar por segmento",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "accion",
+              "value": "Enviar calendario + link de inscripción",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-t",
+      "name": "Acción · Talleres",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2",
+              "name": "accion",
+              "value": "Enviar guía de onboarding de voluntarios",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-v",
+      "name": "Acción · Voluntariado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a3",
+              "name": "accion",
+              "value": "Derivar a coordinación de alianzas",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-d",
+      "name": "Acción · Donación",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a4",
+              "name": "accion",
+              "value": "Respuesta genérica + asignar a bandeja",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-g",
+      "name": "Acción · General / otros",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "id": "resp-01",
+      "name": "Responder al formulario",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        780,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook · Nuevo lead": {
+      "main": [
+        [
+          {
+            "node": "Procesar lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar lead": {
+      "main": [
+        [
+          {
+            "node": "Enrutar por segmento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrutar por segmento": {
+      "main": [
+        [
+          {
+            "node": "Acción · Talleres",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Acción · Voluntariado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Acción · Donación",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Acción · General / otros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acción · Talleres": {
+      "main": [
+        [
+          {
+            "node": "Responder al formulario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acción · Voluntariado": {
+      "main": [
+        [
+          {
+            "node": "Responder al formulario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acción · Donación": {
+      "main": [
+        [
+          {
+            "node": "Responder al formulario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acción · General / otros": {
+      "main": [
+        [
+          {
+            "node": "Responder al formulario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "club-stem-demo"
+  },
+  "tags": [
+    {
+      "name": "club-stem"
+    },
+    {
+      "name": "demo"
+    }
+  ]
+}
