@@ -24,10 +24,12 @@ const BIENVENIDA = {
 // (evita caracteres invisibles en el código fuente).
 const sinTildes = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
 
+// Equivalente al str.title() de Python: pone en mayúscula toda letra que venga
+// después de un carácter no alfabético. Importa para apellidos reales como
+// D'Angelo o Ana-María, donde partir solo por espacios daría "D'angelo".
 const titleCase = (s) =>
-  s.split(/\s+/).filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(' ');
+  s.toLowerCase().replace(/(^|[^\p{L}])(\p{L})/gu, (_, prev, letra) =>
+    prev + letra.toUpperCase());
 
 // ── Nodo 1: normalizar ──
 function normalizarLead(crudo) {
