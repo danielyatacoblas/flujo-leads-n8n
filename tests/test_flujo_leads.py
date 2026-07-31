@@ -44,6 +44,21 @@ def test_canal_por_defecto_es_web():
     assert normalizar_lead({"nombre": "Ana"})["canal"] == "web"
 
 
+@pytest.mark.parametrize("entrada,esperado", [
+    ("lucía d'angelo", "Lucía D'Angelo"),
+    ("ANA-MARÍA TORRES", "Ana-María Torres"),
+    ("josé o'brien", "José O'Brien"),
+    ("maría del carmen", "María Del Carmen"),
+])
+def test_capitaliza_apellidos_con_apostrofo_y_guion(entrada, esperado):
+    """Apellidos reales del Perú: partir solo por espacios daría 'D'angelo'.
+
+    Este caso hacía divergir la implementación Python de la de JavaScript
+    (ver tests/test_paridad_js.py).
+    """
+    assert normalizar_lead({"nombre": entrada})["nombre"] == esperado
+
+
 # ── validación ──────────────────────────────────────────────────────────────
 
 def test_valido_con_email_solamente():
@@ -128,6 +143,17 @@ def test_sin_email_no_se_suscribe_al_newsletter():
     lead = normalizar_lead({"nombre": "Ana", "telefono": "987654321"})
     acc = construir_acciones(lead, "general")
     assert acc["newsletter"]["accion"] == "omitir"
+
+
+@pytest.mark.parametrize("segmento", ["talleres", "voluntariado", "donacion",
+                                      "general"])
+def test_el_email_de_bienvenida_no_deja_variables_sin_reemplazar(segmento):
+    """El correo se envía tal cual a una familia: no puede llevar `{algo}`."""
+    lead = normalizar_lead({"nombre": "Ana Paredes", "email": "ana@mail.com"})
+    texto = construir_acciones(lead, segmento)["email_bienvenida"]
+    assert "{" not in texto and "}" not in texto, (
+        f"el correo de '{segmento}' saldría con una variable sin reemplazar: {texto}")
+    assert texto.strip().endswith((".", "!", "?")), "debe cerrar bien la frase"
 
 
 # ── seguimiento 48 h ────────────────────────────────────────────────────────
