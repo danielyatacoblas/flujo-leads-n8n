@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+# Salidas generadas por la simulación (se regeneran con los scripts)
+data/crm_resultado.csv
+data/log_eventos.jsonl
+.env
