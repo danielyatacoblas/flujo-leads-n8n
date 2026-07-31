@@ -25,7 +25,10 @@ random.seed(42)   # reproducible: mismos leads en cada corrida
 NOMBRES = ["María Quispe", "jorge huamán", "Lucía Fernández", "CARLOS ROJAS",
            "Ana Paredes", "Pedro Castillo Vega", "Rosa Mamani", "diego torres",
            "Elena Vásquez", "Luis Chávez", "Carmen Flores", "José Gutiérrez",
-           "Patricia Ramos", "Miguel Salas", "Sofía Herrera", "Raúl Ponce"]
+           "Patricia Ramos", "Miguel Salas", "Sofía Herrera", "Raúl Ponce",
+           # Apellidos con apóstrofo y nombres compuestos: rompen las
+           # implementaciones ingenuas de "capitalizar cada palabra".
+           "lucía d'angelo", "ANA-MARÍA TORRES", "josé o'brien"]
 
 MENSAJES = {
     "talleres": [

@@ -75,22 +75,26 @@ def build_demo(js: str) -> dict:
               [520, 60],
               {"assignments": {"assignments": [
                   {"id": "a1", "name": "accion", "value": "Enviar calendario + link de inscripción",
-                   "type": "string"}]}, "options": {}}),
+                   "type": "string"}]},
+               "includeOtherFields": True, "options": {}}),
         _node("set-v", "Acción · Voluntariado", "n8n-nodes-base.set", 3.4,
               [520, 220],
               {"assignments": {"assignments": [
                   {"id": "a2", "name": "accion", "value": "Enviar guía de onboarding de voluntarios",
-                   "type": "string"}]}, "options": {}}),
+                   "type": "string"}]},
+               "includeOtherFields": True, "options": {}}),
         _node("set-d", "Acción · Donación", "n8n-nodes-base.set", 3.4,
               [520, 380],
               {"assignments": {"assignments": [
                   {"id": "a3", "name": "accion", "value": "Derivar a coordinación de alianzas",
-                   "type": "string"}]}, "options": {}}),
+                   "type": "string"}]},
+               "includeOtherFields": True, "options": {}}),
         _node("set-g", "Acción · General / otros", "n8n-nodes-base.set", 3.4,
               [520, 540],
               {"assignments": {"assignments": [
                   {"id": "a4", "name": "accion", "value": "Respuesta genérica + asignar a bandeja",
-                   "type": "string"}]}, "options": {}}),
+                   "type": "string"}]},
+               "includeOtherFields": True, "options": {}}),
         _node("resp-01", "Responder al formulario", "n8n-nodes-base.respondToWebhook", 1,
               [780, 300], {"respondWith": "allIncomingItems", "options": {}}),
     ]
@@ -124,10 +128,23 @@ def build_prod(js: str) -> dict:
 
     Requiere configurar credenciales en n8n (ver README).
     """
+    # En producción cambian dos cosas respecto al demo:
+    #  1. el CRM sale del nodo de Google Sheets, no de la memoria del workflow;
+    #  2. el lead entrante se lee del NODO WEBHOOK. En n8n, $input.all() dentro
+    #     de un nodo Code devuelve la salida del nodo ANTERIOR — que aquí es el
+    #     CRM completo, no el lead. Sin esto el workflow procesaría las filas
+    #     históricas de la hoja y nunca el lead recién llegado.
     js_prod = js.replace(
         "const store = $getWorkflowStaticData('global');\nif (!Array.isArray(store.crm)) store.crm = [];",
         "// En producción el CRM llega del nodo Google Sheets anterior\n"
         "const store = { crm: $('CRM · Leer hoja').all().map((i) => i.json) };")
+    js_prod = js_prod.replace(
+        "for (const item of $input.all()) {",
+        "// El lead entrante viene del webhook: $input trae las filas del CRM\n"
+        "for (const item of $('Webhook · Nuevo lead').all()) {")
+    if "$('Webhook · Nuevo lead').all()" not in js_prod:
+        raise SystemExit("no se pudo adaptar el nodo Code a producción: "
+                         "cambió el bucle en workflows/src/procesar_lead.js")
 
     nodes = [
         _node("wh-1", "Webhook · Nuevo lead", "n8n-nodes-base.webhook", 2,

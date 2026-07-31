@@ -1,0 +1,45 @@
+# Corre la suite completa en cada push y en cada pull request.
+# Gratis con GitHub Actions y da el badge verde de "tests passing" en el repo.
+
+name: tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # Node se necesita para el test de paridad entre el nodo de n8n y Python
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Generar la data ficticia
+        run: python scripts/generar_data.py
+
+      - name: Verificar que los workflows se construyen desde el código fuente
+        run: |
+          python scripts/build_workflow.py
+          git diff --exit-code workflows/*.json \
+            || (echo "::error::Los workflows JSON no coinciden con workflows/src/*.js. Corre: python scripts/build_workflow.py" && exit 1)
+
+      - name: Correr los tests
+        run: python -m pytest tests/ -v
+
+      - name: Verificar que la simulación end-to-end funciona
+        run: python scripts/simular_flujo.py
