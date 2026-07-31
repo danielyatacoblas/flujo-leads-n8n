@@ -102,13 +102,13 @@ def segmentar(lead: dict) -> str:
 _BIENVENIDA = {
     "talleres": ("¡Hola {nombre}! Gracias por tu interés en los talleres STEM "
                  "del Club. Aquí tienes el calendario del mes y el enlace de "
-                 "inscripción: {{link_talleres}}"),
+                 "inscripción."),
     "voluntariado": ("¡Hola {nombre}! Nos alegra que quieras ser voluntario/a. "
                      "Te contamos cómo funciona el programa y los próximos "
-                     "onboarding: {{link_voluntariado}}"),
+                     "onboarding."),
     "donacion": ("Hola {nombre}, gracias por querer apoyar al Club STEM. "
                  "Te compartimos las formas de aportar y el impacto de cada "
-                 "una: {{link_donaciones}}"),
+                 "una."),
     "general": ("¡Hola {nombre}! Gracias por escribirnos al Club STEM. "
                 "Un miembro del equipo te contactará muy pronto."),
 }
