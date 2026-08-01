@@ -44,6 +44,30 @@ def test_canal_por_defecto_es_web():
     assert normalizar_lead({"nombre": "Ana"})["canal"] == "web"
 
 
+def test_capitaliza_igual_venga_la_tilde_precompuesta_o_combinante():
+    """Una vocal con tilde puede llegar de dos formas distintas en bytes.
+
+    macOS envia la forma descompuesta (letra + tilde combinante); Windows y
+    Linux suelen enviar la precompuesta. Sin normalizar, la tilde combinante
+    actua como separador de palabra y el nombre sale mal capitalizado.
+
+    Detectado enviando un lead real al webhook de n8n corriendo en Docker.
+    """
+    import unicodedata
+
+    base = "maria quispe".replace("i", "í", 1)   # "maria" -> "maria" con tilde
+    precompuesta = unicodedata.normalize("NFC", base)
+    combinante = unicodedata.normalize("NFD", base)
+    assert precompuesta != combinante, "deben diferir en bytes"
+    assert len(combinante) > len(precompuesta), "la NFD usa un caracter mas"
+
+    esperado = unicodedata.normalize("NFC", "Maria Quispe".replace("i", "í", 1))
+    assert normalizar_lead({"nombre": precompuesta})["nombre"] == esperado
+    obtenido = normalizar_lead({"nombre": combinante})["nombre"]
+    assert obtenido == esperado, (
+        f"la forma descompuesta dio {obtenido!r} en vez de {esperado!r}")
+
+
 @pytest.mark.parametrize("entrada,esperado", [
     ("lucía d'angelo", "Lucía D'Angelo"),
     ("ANA-MARÍA TORRES", "Ana-María Torres"),

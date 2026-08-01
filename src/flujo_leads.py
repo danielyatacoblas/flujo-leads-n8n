@@ -39,8 +39,14 @@ def _sin_tildes(s: str) -> str:
 
 def normalizar_lead(crudo: dict) -> dict:
     """Limpia el payload del formulario: espacios, mayúsculas, teléfono a
-    formato peruano E.164 (+51#########)."""
-    nombre = " ".join(str(crudo.get("nombre", "")).split()).title()
+    formato peruano E.164 (+51#########).
+
+    El texto se normaliza a NFC primero: "í" puede llegar precompuesta o como
+    "i" + tilde combinante (macOS envía esta última). Sin normalizar, la tilde
+    combinante cuenta como separador y "maría" se convierte en "MaríA".
+    """
+    nombre = " ".join(
+        unicodedata.normalize("NFC", str(crudo.get("nombre", ""))).split()).title()
     email = str(crudo.get("email", "")).strip().lower()
     telefono = re.sub(r"[^\d+]", "", str(crudo.get("telefono", "")))
     if telefono.startswith("+51"):
