@@ -113,7 +113,8 @@ def build_demo(js: str) -> dict:
         "Acción · General / otros": {"main": [[{"node": "Responder al formulario", "type": "main", "index": 0}]]},
     }
     return {
-        "name": "Club STEM · Leads (DEMO sin credenciales)",
+        "id": "clubstemleadsdemo",
+            "name": "Club STEM · Leads (DEMO sin credenciales)",
         "nodes": nodes,
         "connections": connections,
         "settings": {"executionOrder": "v1"},
@@ -232,7 +233,8 @@ def build_prod(js: str) -> dict:
         "Filtrar > 48 h sin contacto": {"main": [[{"node": "Equipo · Recordatorio de seguimiento", "type": "main", "index": 0}]]},
     }
     return {
-        "name": "Club STEM · Leads (producción)",
+        "id": "clubstemleadsprod",
+            "name": "Club STEM · Leads (producción)",
         "nodes": nodes,
         "connections": connections,
         "settings": {"executionOrder": "v1"},
