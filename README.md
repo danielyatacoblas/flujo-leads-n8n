@@ -1,6 +1,6 @@
 # 01 · Flujo de leads con n8n — captación → CRM → newsletter → aviso al equipo
 
-[![tests](https://img.shields.io/badge/tests-41%20passed-brightgreen)](tests/)
+[![tests](https://img.shields.io/badge/tests-42%20passed-brightgreen)](tests/)
 [![n8n](https://img.shields.io/badge/n8n-self--hosted-orange)](docker-compose.yml)
 [![licencia](https://img.shields.io/badge/licencia-MIT-blue)](LICENSE)
 
@@ -41,7 +41,7 @@ Formulario web / Podium
 pip install pytest                     # única dependencia
 python scripts/generar_data.py         # genera 44 leads ficticios
 python scripts/simular_flujo.py        # corre el flujo completo en local
-python -m pytest tests/ -v             # 41 tests
+python -m pytest tests/ -v             # 42 tests
 ```
 
 Salida real de `simular_flujo.py`:
@@ -121,7 +121,7 @@ workflow y el código probado se desincronicen en silencio.
 
 ```bash
 python -m pytest tests/ -v
-# 41 passed
+# 42 passed
 ```
 
 ---
