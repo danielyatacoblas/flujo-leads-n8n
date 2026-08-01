@@ -27,9 +27,14 @@ const sinTildes = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
 // Equivalente al str.title() de Python: pone en mayúscula toda letra que venga
 // después de un carácter no alfabético. Importa para apellidos reales como
 // D'Angelo o Ana-María, donde partir solo por espacios daría "D'angelo".
+//
+// Se normaliza a NFC primero porque "í" puede llegar precompuesta o como
+// "i" + tilde combinante (macOS envía esta última): sin normalizar, la tilde
+// cuenta como separador y "maría" termina como "MaríA".
 const titleCase = (s) =>
-  s.toLowerCase().replace(/(^|[^\p{L}])(\p{L})/gu, (_, prev, letra) =>
-    prev + letra.toUpperCase());
+  s.normalize('NFC').toLowerCase()
+    .replace(/(^|[^\p{L}\p{M}])(\p{L})/gu, (_, prev, letra) =>
+      prev + letra.toUpperCase());
 
 // ── Nodo 1: normalizar ──
 function normalizarLead(crudo) {
