@@ -1,0 +1,451 @@
+{
+  "id": "clubstempublicar",
+  "name": "Club STEM · 2. Publicar aprobados",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "cron-p",
+      "name": "Cada hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZAR_ID_HOJA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Aprobacion",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "gs-ap",
+      "name": "Cola · Leer aprobados",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -60,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Nodo Code de n8n — \"Filtrar publicables\"\n// Deja pasar SOLO los posts aprobados por una persona cuya fecha programada\n// ya llegó. Es la implementación de la política de revisión humana dentro\n// del workflow (espejo de ColaAprobacion.listos_para_publicar).\n\nconst ahora = Date.now();\n\nreturn $input.all().filter((item) => {\n  const f = item.json;\n\n  // Regla de oro: sin aprobación humana explícita, no se publica.\n  if (String(f.estado || '').toLowerCase() !== 'aprobado') return false;\n\n  // Debe constar quién aprobó (trazabilidad).\n  if (!String(f.revisor || '').trim()) return false;\n\n  // Respeta la fecha programada.\n  if (f.fecha_programada) {\n    const programada = Date.parse(f.fecha_programada);\n    if (!isNaN(programada) && ahora < programada) return false;\n  }\n\n  return true;\n}).map((item) => ({\n  json: {\n    ...item.json,\n    publicado_en: new Date().toISOString(),\n  },\n}));\n"
+      },
+      "id": "code-f",
+      "name": "Filtrar publicables",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        300
+      ],
+      "notes": "Solo pasa lo aprobado por una persona y con fecha cumplida"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "r1",
+                    "leftValue": "={{ $json.red }}",
+                    "rightValue": "instagram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "instagram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "r2",
+                    "leftValue": "={{ $json.red }}",
+                    "rightValue": "facebook",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "facebook"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "r3",
+                    "leftValue": "={{ $json.red }}",
+                    "rightValue": "linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "linkedin"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "otras"
+        }
+      },
+      "id": "sw-red",
+      "name": "Enrutar por red",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        380,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.IG_USER_ID }}/media_publish",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ caption: $json.texto }) }}",
+        "options": {}
+      },
+      "id": "pub-ig",
+      "name": "Publicar · Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        620,
+        60
+      ],
+      "onError": "continueErrorOutput",
+      "notes": "Meta Graph API. Alternativa gratuita para demo: Buffer"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.FB_PAGE_ID }}/feed",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message: $json.texto }) }}",
+        "options": {}
+      },
+      "id": "pub-fb",
+      "name": "Publicar · Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        620,
+        220
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "REEMPLAZAR_ORG_ID",
+        "text": "={{ $json.texto }}",
+        "additionalFields": {}
+      },
+      "id": "pub-li",
+      "name": "Publicar · LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        620,
+        380
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "id": "noop-otras",
+      "name": "Otras redes (manual)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        620,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZAR_ID_HOJA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Aprobacion",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "id_cola"
+          ],
+          "value": {
+            "id_cola": "={{ $json.id_cola }}",
+            "estado": "publicado",
+            "publicado_en": "={{ $json.publicado_en }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "gs-upd",
+      "name": "Cola · Marcar publicado",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZAR_ID_HOJA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Aprobacion",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "id_cola"
+          ],
+          "value": {
+            "id_cola": "={{ $json.id_cola }}",
+            "estado": "fallido"
+          }
+        },
+        "options": {}
+      },
+      "id": "gs-err",
+      "name": "Registrar fallo para reintento",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        480
+      ],
+      "notes": "El post NO se pierde: queda visible para reintento manual"
+    },
+    {
+      "parameters": {
+        "chatId": "REEMPLAZAR_CHAT_ID",
+        "text": "= Falló la publicación de {{ $json.id_cola }}. Queda en la cola para reintento.",
+        "additionalFields": {}
+      },
+      "id": "tg-err",
+      "name": "Avisar fallo al equipo",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Cada hora": {
+      "main": [
+        [
+          {
+            "node": "Cola · Leer aprobados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cola · Leer aprobados": {
+      "main": [
+        [
+          {
+            "node": "Filtrar publicables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar publicables": {
+      "main": [
+        [
+          {
+            "node": "Enrutar por red",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrutar por red": {
+      "main": [
+        [
+          {
+            "node": "Publicar · Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publicar · Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publicar · LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Otras redes (manual)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar · Instagram": {
+      "main": [
+        [
+          {
+            "node": "Cola · Marcar publicado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar fallo para reintento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar · Facebook": {
+      "main": [
+        [
+          {
+            "node": "Cola · Marcar publicado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar fallo para reintento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar · LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Cola · Marcar publicado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar fallo para reintento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar fallo para reintento": {
+      "main": [
+        [
+          {
+            "node": "Avisar fallo al equipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "name": "club-stem"
+    },
+    {
+      "name": "redes"
+    }
+  ]
+}
