@@ -93,7 +93,8 @@ def main():
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with OUT.open("w", newline="", encoding="utf-8") as f:
-        wr = csv.DictWriter(f, fieldnames=list(filas[0].keys()))
+        wr = csv.DictWriter(f, fieldnames=list(filas[0].keys(, lineterminator="
+")))
         wr.writeheader()
         wr.writerows(filas)
     print(f"✓ {OUT.relative_to(ROOT)} — {len(filas)} leads ficticios "
