@@ -2,7 +2,12 @@
 
 <p align="center"><i>Ningún lead se pierde y nadie copia datos a mano</i></p>
 
-<p align="center">![tests](https://img.shields.io/badge/tests-42%20passed-brightgreen) ![n8n](https://img.shields.io/badge/n8n-self--hosted-EA4B71) ![python](https://img.shields.io/badge/python-3.12-3776AB) ![licencia](https://img.shields.io/badge/licencia-MIT-blue)</p>
+<p align="center">
+  <img alt="tests" src="https://img.shields.io/badge/tests-42%20passed-brightgreen">
+  <img alt="n8n" src="https://img.shields.io/badge/n8n-self--hosted-EA4B71">
+  <img alt="python" src="https://img.shields.io/badge/python-3.12-3776AB">
+  <img alt="licencia" src="https://img.shields.io/badge/licencia-MIT-blue">
+</p>
 
 ---
 
