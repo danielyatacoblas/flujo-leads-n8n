@@ -87,6 +87,9 @@
 
     <label for="url">URL del webhook</label>
     <input id="url" placeholder="http://localhost:5678/webhook/lead-demo" />
+    <button type="button" id="btnLocal" class="chip" style="margin-top:8px">
+      usar n8n local
+    </button>
 
     <p class="note">
       <b>Cómo probar en 3 pasos:</b><br />
@@ -159,9 +162,13 @@ function pintar(r, simulado){
     el.textContent = `${tag}✗ INVÁLIDO · ${r.motivo||'datos insuficientes'}\nNo entra al CRM.`;
   }
 }
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+document.querySelectorAll('.chip[data-msg]').forEach(c=>c.onclick=()=>{
   document.getElementById('mensaje').value=c.dataset.msg;
 });
+/* atajo para apuntar al n8n que levanta docker compose */
+document.getElementById('btnLocal').onclick=()=>{
+  document.getElementById('url').value='http://localhost:5678/webhook/lead-demo';
+};
 document.getElementById('form').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const btn=document.getElementById('btn'); btn.disabled=true;
