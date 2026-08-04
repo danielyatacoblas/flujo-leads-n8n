@@ -6,56 +6,170 @@
 <title>Club STEM · Formulario de contacto (demo)</title>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{--bg:#F4F6F9;--card:#fff;--border:#E6E9EF;--ink:#16202E;--muted:#7A879B;
-        --accent:#2D6CDF;--accent-2:#1E56BD;--ok:#129A6B;--warn:#E19100;--err:#E5484D}
-  body{font-family:'Inter',system-ui,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);
-       min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-  .wrap{width:100%;max-width:920px;display:grid;grid-template-columns:1fr 340px;gap:18px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;
-        box-shadow:0 1px 2px rgba(16,35,66,.04),0 8px 24px rgba(16,35,66,.06)}
-  h1{font-size:20px;letter-spacing:-.02em}
-  .sub{color:var(--muted);font-size:13px;margin-top:4px;margin-bottom:18px}
-  label{display:block;font-size:12.5px;font-weight:600;margin:12px 0 5px}
-  input,textarea,select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:9px;
-        font:14px inherit;background:#fff;color:var(--ink)}
-  input:focus,textarea:focus,select:focus{outline:2px solid rgba(45,108,223,.25);border-color:var(--accent)}
-  textarea{min-height:84px;resize:vertical}
+  :root{
+    --bg:#EEF1F6; --card:#fff; --border:#E3E7EE; --line:#F0F2F6;
+    --ink:#141C29; --ink-2:#4A5568; --muted:#7A879B;
+    --accent:#2D6CDF; --accent-2:#1E56BD; --accent-soft:#EDF3FE;
+    --ok:#0E8A5F; --ok-soft:#E7F6F0;
+    --warn:#B4700A; --warn-soft:#FDF3E3;
+    --err:#CE3438; --err-soft:#FCECEC;
+    --sombra:0 1px 2px rgba(16,35,66,.05), 0 10px 30px rgba(16,35,66,.07);
+  }
+  body{font-family:'Inter',system-ui,'Segoe UI',sans-serif;background:var(--bg);
+       color:var(--ink);min-height:100vh;padding:28px 20px;line-height:1.5;
+       -webkit-font-smoothing:antialiased}
+  .wrap{width:100%;max-width:1060px;margin:0 auto;
+        display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+        padding:26px;box-shadow:var(--sombra)}
+
+  .marca{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .logo{width:42px;height:42px;border-radius:12px;background:var(--accent);color:#fff;
+        display:grid;place-items:center;font-weight:800;font-size:16px;letter-spacing:-.03em}
+  h1{font-size:19px;letter-spacing:-.02em;font-weight:700}
+  .sub{color:var(--muted);font-size:12.5px;margin-top:1px}
+  h2{font-size:14px;font-weight:700;letter-spacing:-.01em}
+
+  label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin:14px 0 5px}
+  input,textarea,select{width:100%;padding:11px 13px;border:1px solid var(--border);
+        border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink);transition:.15s}
+  input::placeholder,textarea::placeholder{color:#A9B2C0}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);
+        box-shadow:0 0 0 3px rgba(45,108,223,.14)}
+  textarea{min-height:88px;resize:vertical}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  button{margin-top:18px;width:100%;padding:12px;border:0;border-radius:10px;background:var(--accent);
-        color:#fff;font:700 14px inherit;cursor:pointer;transition:.15s}
-  button:hover{background:var(--accent-2)}
-  button:disabled{opacity:.6;cursor:not-allowed}
-  .cfg{font-size:12px}
-  .cfg code{background:#F1F4F9;padding:1px 5px;border-radius:5px;font-size:11.5px}
-  .res{margin-top:14px;font-size:13px;border-radius:10px;padding:12px;display:none;white-space:pre-wrap;
-       font-family:ui-monospace,Consolas,monospace;line-height:1.5}
-  .res.ok{display:block;background:rgba(18,154,107,.08);border:1px solid rgba(18,154,107,.3);color:#0B6B4A}
-  .res.warn{display:block;background:rgba(225,145,0,.08);border:1px solid rgba(225,145,0,.3);color:#8A5A00}
-  .res.err{display:block;background:rgba(229,72,77,.08);border:1px solid rgba(229,72,77,.3);color:#9B2C2F}
+
+  .enviar{margin-top:20px;width:100%;padding:13px;border:0;border-radius:11px;
+        background:var(--accent);color:#fff;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer;
+        transition:.15s;box-shadow:0 4px 14px rgba(45,108,223,.3)}
+  .enviar:hover:not(:disabled){background:var(--accent-2);transform:translateY(-1px)}
+  .enviar:active:not(:disabled){transform:translateY(0)}
+  .enviar:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-  .chip{font-size:11px;padding:3px 9px;border-radius:20px;background:#EEF3FC;color:var(--accent);font-weight:600;cursor:pointer;border:1px solid rgba(45,108,223,.2)}
-  .chip:hover{background:#E2EBFA}
-  .note{font-size:11.5px;color:var(--muted);margin-top:14px;line-height:1.5}
-  @media(max-width:800px){.wrap{grid-template-columns:1fr}}
+  .chip{font-size:11.5px;padding:4px 11px;border-radius:20px;background:var(--accent-soft);
+        color:var(--accent);font-weight:600;cursor:pointer;border:1px solid rgba(45,108,223,.2);
+        transition:.15s}
+  .chip:hover{background:#DDE9FC}
+
+  /* ── Resultado del último envío ─────────────────────────────── */
+  .res{margin-top:16px;border-radius:12px;padding:14px 16px;display:none;
+       border:1px solid transparent}
+  .res.visible{display:block}
+  .res.destacar{animation:latido .6s ease-out}
+  @keyframes latido{
+    0%{transform:scale(.985);box-shadow:0 0 0 0 rgba(45,108,223,.35)}
+    60%{transform:scale(1);box-shadow:0 0 0 10px rgba(45,108,223,0)}
+    100%{transform:scale(1)}
+  }
+  .res-cab{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .insignia{font-weight:800;font-size:10.5px;font-family:inherit;letter-spacing:.06em;text-transform:uppercase;
+        padding:4px 10px;border-radius:20px}
+  .res-tit{font-weight:700;font-size:14px}
+  .res-detalle{margin-top:10px;font-size:12.5px;color:var(--ink-2)}
+  .res-detalle li{margin:4px 0 0 18px}
+  .res.ok{background:var(--ok-soft);border-color:rgba(14,138,95,.28)}
+  .res.ok .insignia{background:var(--ok);color:#fff}
+  .res.warn{background:var(--warn-soft);border-color:rgba(180,112,10,.3)}
+  .res.warn .insignia{background:var(--warn);color:#fff}
+  .res.err{background:var(--err-soft);border-color:rgba(206,52,56,.28)}
+  .res.err .insignia{background:var(--err);color:#fff}
+  .fuente{font-size:11px;color:var(--muted);margin-left:auto}
+
+  /* ── Historial de envíos ────────────────────────────────────── */
+  .hist{margin-top:20px;border-top:1px solid var(--line);padding-top:16px}
+  .hist-cab{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .contador{font-size:11.5px;color:var(--muted)}
+  .hist-lista{margin-top:10px;max-height:240px;overflow-y:auto;display:flex;
+        flex-direction:column;gap:7px}
+  .hist-lista::-webkit-scrollbar{width:6px}
+  .hist-lista::-webkit-scrollbar-thumb{background:#D5DBE5;border-radius:3px}
+  .env{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;
+       background:#FAFBFD;border:1px solid var(--line);font-size:12.5px;
+       animation:entrar .35s ease-out}
+  @keyframes entrar{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .env-n{font-weight:800;font-size:11px;font-family:inherit;color:var(--muted);min-width:26px}
+  .env-badge{font-weight:800;font-size:9.5px;font-family:inherit;letter-spacing:.05em;text-transform:uppercase;
+        padding:3px 8px;border-radius:20px;white-space:nowrap}
+  .env-badge.ok{background:var(--ok-soft);color:var(--ok)}
+  .env-badge.warn{background:var(--warn-soft);color:var(--warn)}
+  .env-badge.err{background:var(--err-soft);color:var(--err)}
+  .env-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+        color:var(--ink-2)}
+  .env-hora{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .vacio{font-size:12px;color:var(--muted);font-style:italic;padding:6px 0}
+
+  /* ── Panel lateral ──────────────────────────────────────────── */
+  .cfg{font-size:12.5px}
+  .cfg code{background:#F1F4F9;padding:2px 6px;border-radius:5px;font-size:11.5px;
+        font-family:ui-monospace,Consolas,monospace}
+  .btn-local{margin-top:9px;width:100%;padding:9px;border-radius:9px;
+        border:1px solid rgba(45,108,223,.28);background:var(--accent-soft);
+        color:var(--accent);font-weight:600;font-size:12.5px;font-family:inherit;cursor:pointer;transition:.15s}
+  .btn-local:hover{background:#DDE9FC}
+  .estado{display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12px;
+        color:var(--ink-2)}
+  .punto{width:8px;height:8px;border-radius:50%;background:#C4CBD6;flex-shrink:0}
+  .punto.on{background:var(--ok);box-shadow:0 0 0 3px rgba(14,138,95,.18)}
+  .punto.sim{background:var(--warn);box-shadow:0 0 0 3px rgba(180,112,10,.18)}
+  .pasos{margin-top:16px;font-size:12px;color:var(--ink-2);line-height:1.65}
+  .pasos li{margin-left:16px;margin-top:4px}
+  .note{font-size:11.5px;color:var(--muted);margin-top:14px;line-height:1.55}
+
+  /* ── Toast ──────────────────────────────────────────────────── */
+  .toasts{position:fixed;right:22px;bottom:22px;z-index:60;display:flex;
+        flex-direction:column;gap:9px;align-items:flex-end}
+  .toast{display:flex;align-items:center;gap:11px;min-width:270px;max-width:380px;
+        background:#141C29;color:#fff;padding:13px 16px;border-radius:12px;
+        box-shadow:0 10px 34px rgba(0,0,0,.26);font-size:13px;
+        animation:aparecer .32s cubic-bezier(.2,.9,.3,1)}
+  .toast.saliendo{animation:desaparecer .28s ease-in forwards}
+  @keyframes aparecer{from{opacity:0;transform:translateX(28px) scale(.97)}
+                      to{opacity:1;transform:none}}
+  @keyframes desaparecer{to{opacity:0;transform:translateX(28px) scale(.97)}}
+  .toast .barra{width:4px;align-self:stretch;border-radius:3px;flex-shrink:0}
+  .toast.ok   .barra{background:#3DD68C}
+  .toast.warn .barra{background:#F5B942}
+  .toast.err  .barra{background:#FF6B6E}
+  .toast-tit{font-weight:700}
+  .toast-sub{font-size:11.5px;color:#B9C2D0;margin-top:1px}
+  .toast-n{margin-left:auto;font-weight:800;font-size:10.5px;font-family:inherit;color:#8E99AB;
+        background:rgba(255,255,255,.09);padding:3px 8px;border-radius:20px}
+
+  @media(max-width:860px){
+    .wrap{grid-template-columns:1fr}
+    .toasts{left:16px;right:16px;align-items:stretch}
+    .toast{max-width:none}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .res.destacar,.env,.toast{animation:none}
+    .enviar:hover:not(:disabled){transform:none}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
+
   <form class="card" id="form">
-    <h1>Contáctanos · Club STEM</h1>
-    <div class="sub">Formulario demo — simula el que estaría en la web o en Podium.</div>
+    <div class="marca">
+      <div class="logo">CS</div>
+      <div>
+        <h1>Contáctanos</h1>
+        <div class="sub">Formulario demo — simula el de la web o el de Podium</div>
+      </div>
+    </div>
 
     <label for="nombre">Nombre completo *</label>
-    <input id="nombre" name="nombre" required placeholder="María Quispe" />
+    <input id="nombre" name="nombre" required placeholder="María Quispe" autocomplete="off" />
 
     <div class="row">
       <div>
         <label for="email">Correo</label>
-        <input id="email" name="email" type="email" placeholder="maria@correo.com" />
+        <input id="email" name="email" type="email" placeholder="maria@correo.com" autocomplete="off" />
       </div>
       <div>
         <label for="telefono">Teléfono</label>
-        <input id="telefono" name="telefono" placeholder="987 654 321" />
+        <input id="telefono" name="telefono" placeholder="987 654 321" autocomplete="off" />
       </div>
     </div>
 
@@ -77,50 +191,78 @@
       <span class="chip" data-msg="Hola, quisiera más información">ej. general</span>
     </div>
 
-    <button type="submit" id="btn">Enviar</button>
-    <div class="res" id="res"></div>
+    <button type="submit" class="enviar" id="btn">Enviar</button>
+
+    <div class="res" id="res" role="status" aria-live="polite"></div>
+
+    <div class="hist">
+      <div class="hist-cab">
+        <h2>Envíos de esta sesión</h2>
+        <span class="contador" id="contador">ninguno todavía</span>
+      </div>
+      <div class="hist-lista" id="histLista">
+        <div class="vacio">Cada envío queda registrado aquí, aunque el resultado se repita.</div>
+      </div>
+    </div>
   </form>
 
   <aside class="card cfg">
-    <h1 style="font-size:15px"> Configuración</h1>
-    <div class="sub" style="margin-bottom:12px">Pega aquí la URL del webhook que te da n8n.</div>
+    <h2>Configuración</h2>
+    <div class="sub" style="margin-bottom:14px">A dónde se manda el formulario.</div>
 
     <label for="url">URL del webhook</label>
-    <input id="url" placeholder="http://localhost:5678/webhook/lead-demo" />
-    <button type="button" id="btnLocal" class="chip" style="margin-top:8px">
-      usar n8n local
-    </button>
+    <input id="url" placeholder="http://localhost:5678/webhook/lead-demo" autocomplete="off" />
+    <button type="button" class="btn-local" id="btnLocal">Usar el n8n local</button>
+    <button type="button" class="btn-local" id="btnPrueba">Modo prueba (canvas en vivo)</button>
+
+    <div class="estado">
+      <span class="punto sim" id="punto"></span>
+      <span id="estadoTxt">Modo simulado (sin n8n)</span>
+    </div>
+
+    <div class="pasos">
+      <b>Levantar n8n en tres pasos:</b>
+      <ol>
+        <li><code>docker compose up -d</code></li>
+        <li>Importa <code>workflows/workflow_leads_demo.json</code> y actívalo</li>
+        <li>Pulsa «Usar el n8n local»</li>
+      </ol>
+    </div>
 
     <p class="note">
-      <b>Cómo probar en 3 pasos:</b><br />
-      1. Levanta n8n: <code>docker compose up -d</code><br />
-      2. Importa <code>workflows/workflow_leads_demo.json</code> y actívalo<br />
-      3. Copia la URL de producción del nodo Webhook y pégala arriba
+      <b>Modo prueba:</b> en n8n abre el workflow y pulsa <b>Execute workflow</b>.
+      Queda esperando una llamada y, al enviar el formulario, el lienzo se anima
+      mostrando los datos pasar por cada nodo. Solo escucha un envío por vez:
+      vuelve a pulsarlo para el siguiente.
     </p>
+
     <p class="note">
       Sin URL configurada, el formulario corre en <b>modo simulado</b>: aplica la
-      misma lógica en el navegador para que veas el resultado igual.
+      misma lógica dentro del navegador para que veas el resultado igual.
     </p>
   </aside>
 </div>
 
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
 <script>
-/* Modo simulado: misma lógica del nodo n8n, para demo sin backend. */
+/* Modo simulado: la misma lógica del nodo de n8n, para probar sin backend. */
 const KEYWORDS = {
   donacion: ['donar','donacion','aporte','auspicio','sponsor','empresa','rse'],
   voluntariado: ['voluntari','ayudar','ensenar','mentor','apoyar'],
   talleres: ['taller','clase','curso','robot','program','stem','inscri','hij','alumn'],
 };
 const sinTildes = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
-const enviados = [];   // CRM en memoria, para demostrar la deduplicación
+const enviados = [];      // CRM en memoria, para demostrar la deduplicación
+let numEnvio = 0;
 
 function normalizar(d){
   let tel = String(d.telefono||'').replace(/[^\d+]/g,'');
   if(tel.startsWith('+51')){}
   else if(tel.startsWith('51') && tel.length===11) tel='+'+tel;
   else if(tel.length===9) tel='+51'+tel;
-  const nombre = String(d.nombre||'').trim().split(/\s+/)
-    .map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+  const nombre = String(d.nombre||'').normalize('NFC').toLowerCase()
+    .replace(/(^|[^\p{L}\p{M}])(\p{L})/gu, (_,p,c)=>p+c.toUpperCase());
   return {nombre, email:String(d.email||'').trim().toLowerCase(), telefono:tel,
           mensaje:String(d.mensaje||'').trim(), canal:d.canal||'web'};
 }
@@ -134,60 +276,166 @@ function simular(d){
   const lead = normalizar(d);
   const emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(lead.email);
   const telOk = /^\+51\d{9}$/.test(lead.telefono);
-  if(!lead.nombre) return {resultado:'invalido', motivo:'sin nombre'};
-  if(!emailOk && !telOk) return {resultado:'invalido', motivo:'sin email ni teléfono válidos'};
+  if(!lead.nombre) return {resultado:'invalido', motivo:'sin nombre', lead};
+  if(!emailOk && !telOk) return {resultado:'invalido', motivo:'sin email ni teléfono válidos', lead};
   if(enviados.some(f=>(lead.email&&f.email===lead.email)||(lead.telefono&&f.telefono===lead.telefono)))
     return {resultado:'duplicado', lead};
   const segmento = segmentar(lead.mensaje);
   enviados.push(lead);
   return {resultado:'nuevo', segmento, lead,
-    acciones:[`CRM: fila registrada (estado "nuevo")`,
-              lead.email?`Newsletter: suscribir con tag "${segmento}"`:`Newsletter: omitido (sin email)`,
-              `Email de bienvenida del segmento "${segmento}"`,
-              `Telegram al equipo: nuevo lead ${lead.nombre}`,
-              `Programado: recordatorio a las 48 h si nadie lo contacta`]};
+    acciones:['CRM: fila registrada con estado «nuevo»',
+              lead.email?`Newsletter: suscrito con la etiqueta «${segmento}»`:'Newsletter: omitido (sin correo)',
+              `Correo de bienvenida del segmento «${segmento}»`,
+              `Aviso al equipo por Telegram`,
+              'Programado: recordatorio a las 48 h si nadie lo contacta']};
 }
-function pintar(r, simulado){
+
+/* ── Toast ───────────────────────────────────────────────────── */
+const TIPO = {nuevo:'ok', duplicado:'warn', invalido:'err'};
+const TITULO = {nuevo:'Lead registrado', duplicado:'Lead duplicado', invalido:'Lead descartado'};
+
+function toast(resultado, detalle, n){
+  const cont = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (TIPO[resultado] || 'ok');
+  el.innerHTML = `<span class="barra"></span>
+    <div><div class="toast-tit">${TITULO[resultado] || 'Enviado'}</div>
+    <div class="toast-sub">${detalle}</div></div>
+    <span class="toast-n">#${n}</span>`;
+  cont.appendChild(el);
+  setTimeout(()=>{ el.classList.add('saliendo');
+                   setTimeout(()=>el.remove(), 300); }, 3600);
+  while(cont.children.length > 3) cont.firstElementChild.remove();
+}
+
+/* ── Historial ───────────────────────────────────────────────── */
+function alHistorial(n, resultado, texto){
+  const lista = document.getElementById('histLista');
+  const vacio = lista.querySelector('.vacio');
+  if(vacio) vacio.remove();
+  const hora = new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const fila = document.createElement('div');
+  fila.className = 'env';
+  fila.innerHTML = `<span class="env-n">#${n}</span>
+    <span class="env-badge ${TIPO[resultado]||'ok'}">${resultado}</span>
+    <span class="env-txt">${texto}</span>
+    <span class="env-hora">${hora}</span>`;
+  lista.prepend(fila);
+  document.getElementById('contador').textContent =
+    n === 1 ? '1 envío' : `${n} envíos`;
+}
+
+/* ── Panel de resultado ──────────────────────────────────────── */
+function pintar(r, simulado, n){
   const el = document.getElementById('res');
-  const tag = simulado ? '[modo simulado] ' : '[n8n] ';
-  if(r.resultado==='nuevo'){
-    el.className='res ok';
-    el.textContent = `${tag}✓ Lead NUEVO · segmento: ${r.segmento}\n\n` +
-      (r.acciones ? r.acciones.map(a=>'  → '+a).join('\n') : JSON.stringify(r,null,2));
-  } else if(r.resultado==='duplicado'){
-    el.className='res warn';
-    el.textContent = `${tag}↻ DUPLICADO · ya existe en el CRM.\nNo se re-registra ni se re-suscribe al newsletter.`;
+  const fuente = simulado ? 'modo simulado' : 'respuesta de n8n';
+  let clase, insignia, titulo, cuerpo = '';
+
+  if(r.resultado === 'nuevo'){
+    clase = 'ok'; insignia = 'nuevo';
+    titulo = `Segmento detectado: ${r.segmento}`;
+    const acciones = r.acciones || [];
+    cuerpo = acciones.length
+      ? `<div class="res-detalle">Acciones disparadas:<ul>${
+          acciones.map(a=>`<li>${a}</li>`).join('')}</ul></div>`
+      : `<div class="res-detalle">Acción: ${r.accion || '—'}</div>`;
+  } else if(r.resultado === 'duplicado'){
+    clase = 'warn'; insignia = 'duplicado';
+    titulo = 'Ya existe en el CRM';
+    cuerpo = `<div class="res-detalle">No se vuelve a registrar ni se re-suscribe
+              al newsletter. La comparación es por correo y por teléfono ya
+              normalizado, así que detecta el mismo número escrito distinto.</div>`;
   } else {
-    el.className='res err';
-    el.textContent = `${tag}✗ INVÁLIDO · ${r.motivo||'datos insuficientes'}\nNo entra al CRM.`;
+    clase = 'err'; insignia = 'inválido';
+    titulo = r.motivo || 'Datos insuficientes';
+    cuerpo = `<div class="res-detalle">No entra al CRM.</div>`;
   }
+
+  el.className = `res visible ${clase}`;
+  el.innerHTML = `<div class="res-cab">
+      <span class="insignia">${insignia}</span>
+      <span class="res-tit">${titulo}</span>
+      <span class="fuente">envío #${n} · ${fuente}</span>
+    </div>${cuerpo}`;
+  // reinicia la animación para que se note aunque el resultado sea idéntico
+  el.classList.remove('destacar');
+  void el.offsetWidth;
+  el.classList.add('destacar');
 }
+
+/* ── Controles ───────────────────────────────────────────────── */
 document.querySelectorAll('.chip[data-msg]').forEach(c=>c.onclick=()=>{
-  document.getElementById('mensaje').value=c.dataset.msg;
+  document.getElementById('mensaje').value = c.dataset.msg;
 });
-/* atajo para apuntar al n8n que levanta docker compose */
-document.getElementById('btnLocal').onclick=()=>{
-  document.getElementById('url').value='http://localhost:5678/webhook/lead-demo';
+
+const url = document.getElementById('url');
+function refrescarEstado(){
+  const puesta = url.value.trim();
+  document.getElementById('punto').className = 'punto ' + (puesta ? 'on' : 'sim');
+  document.getElementById('estadoTxt').textContent =
+    !puesta ? 'Modo simulado (sin n8n)'
+    : puesta.includes('/webhook-test/') ? 'n8n en modo prueba (lienzo en vivo)'
+    : 'Conectado a n8n';
+}
+url.addEventListener('input', refrescarEstado);
+document.getElementById('btnLocal').onclick = () => {
+  url.value = 'http://localhost:5678/webhook/lead-demo';
+  refrescarEstado();
 };
+/* La ruta de prueba de n8n: solo responde mientras el workflow está a la
+   escucha, y a cambio el lienzo muestra los datos recorriendo los nodos. */
+document.getElementById('btnPrueba').onclick = () => {
+  url.value = 'http://localhost:5678/webhook-test/lead-demo';
+  refrescarEstado();
+};
+
 document.getElementById('form').addEventListener('submit', async (e)=>{
   e.preventDefault();
-  const btn=document.getElementById('btn'); btn.disabled=true;
+  const btn = document.getElementById('btn');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+
   const datos = Object.fromEntries(new FormData(e.target).entries());
   datos.fecha = new Date().toISOString().slice(0,19);
-  const url = document.getElementById('url').value.trim();
-  if(!url){ pintar(simular(datos), true); btn.disabled=false; return; }
-  try{
-    const resp = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
-                                 body:JSON.stringify(datos)});
-    const data = await resp.json();
-    pintar(Array.isArray(data)?data[0]:data, false);
-  }catch(err){
-    const el=document.getElementById('res'); el.className='res err';
-    el.textContent='✗ No se pudo contactar el webhook:\n'+err.message+
-                   '\n\n¿Está n8n corriendo y el workflow ACTIVO?';
+  const destino = url.value.trim();
+  numEnvio++;
+
+  let r, simulado = true;
+  if(!destino){
+    r = simular(datos);
+  } else {
+    try {
+      const resp = await fetch(destino, {method:'POST',
+        headers:{'Content-Type':'application/json'}, body:JSON.stringify(datos)});
+      const data = await resp.json();
+      r = Array.isArray(data) ? data[0] : data;
+      simulado = false;
+    } catch(err){
+      const el = document.getElementById('res');
+      el.className = 'res visible err';
+      el.innerHTML = `<div class="res-cab"><span class="insignia">error</span>
+        <span class="res-tit">No se pudo contactar el webhook</span></div>
+        <div class="res-detalle">${err.message}<br>¿Está n8n corriendo y el
+        workflow activo?</div>`;
+      toast('invalido', 'No respondió el webhook', numEnvio);
+      btn.disabled = false; btn.textContent = 'Enviar';
+      return;
+    }
   }
-  btn.disabled=false;
+
+  const etiqueta = (datos.nombre || 'sin nombre') +
+    (r.segmento ? ` · ${r.segmento}` : '');
+  pintar(r, simulado, numEnvio);
+  alHistorial(numEnvio, r.resultado || 'enviado', etiqueta);
+  toast(r.resultado,
+        r.resultado === 'nuevo' ? `Segmento: ${r.segmento}`
+        : r.resultado === 'duplicado' ? 'Ya estaba en el CRM'
+        : (r.motivo || 'Datos insuficientes'),
+        numEnvio);
+
+  btn.disabled = false; btn.textContent = 'Enviar';
 });
+
+refrescarEstado();
 </script>
 </body>
 </html>
