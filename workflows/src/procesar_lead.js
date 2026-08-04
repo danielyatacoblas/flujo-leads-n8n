@@ -124,7 +124,7 @@ for (const item of $input.all()) {
       },
       email_bienvenida: BIENVENIDA[segmento].replace('{nombre}', lead.nombre.split(' ')[0]),
       notificacion_equipo:
-        '🔔 Nuevo lead [' + segmento + '] ' + lead.nombre +
+        ' Nuevo lead [' + segmento + '] ' + lead.nombre +
         ' (' + lead.canal + ') — ' + (lead.email || lead.telefono),
     },
   });

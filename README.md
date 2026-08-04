@@ -11,7 +11,7 @@
 
 ---
 
-## 🎥 Demo en video
+## Demo en video
 
 <!-- ────────────────────────────────────────────────────────────────────
      ESPACIO RESERVADO PARA EL VIDEO
@@ -24,16 +24,16 @@
      Y borra el aviso de abajo.
      ──────────────────────────────────────────────────────────────────── -->
 
-> 🎬 *Video de la demo en camino.* Mientras tanto, el proyecto corre completo
-> en local en menos de dos minutos siguiendo [⚡ Probarlo](#-probarlo-en-2-minutos).
+> *Video de la demo en camino.* Mientras tanto, el proyecto corre completo
+> en local en menos de dos minutos siguiendo [Probarlo](#probarlo-en-2-minutos).
 
 ---
 
-## 🎯 El problema
+## El problema
 
 Cada consulta que llega por la web o por Podium se copiaba a mano a una hoja de cálculo y a la lista de correo. Se perdían leads, se duplicaban registros y nadie sabía a quién ya se había contactado.
 
-## 💡 Qué hace este proyecto
+## Qué hace este proyecto
 
 1. **Limpia** el dato: el teléfono queda siempre en formato `+51#########` y el nombre bien capitalizado, venga como venga del formulario.
 2. **Descarta duplicados** por correo o por teléfono, aunque estén escritos distinto (`987-654-321` y `+51987654321` son la misma persona).
@@ -43,27 +43,27 @@ Cada consulta que llega por la web o por Podium se copiaba a mano a una hoja de 
 
 ---
 
-## 🗺️ Cómo funciona
+## Cómo funciona
 
 ```mermaid
 flowchart TD
-    F["📝 Formulario web / Podium"] -->|webhook| N
+    F[" Formulario web / Podium"] -->|webhook| N
     subgraph N ["n8n"]
         A["Normalizar<br/>teléfono y nombre"] --> B{"¿Datos<br/>utilizables?"}
-        B -->|no| X["❌ Descartado<br/>con motivo"]
+        B -->|no| X[" Descartado<br/>con motivo"]
         B -->|sí| C{"¿Ya existe<br/>en el CRM?"}
         C -->|sí| Y["↻ Duplicado<br/>no se re-suscribe"]
         C -->|no| D["Segmentar por<br/>palabras clave"]
     end
-    D --> E["📊 CRM<br/>Google Sheets"]
-    D --> G["✉️ Newsletter<br/>etiqueta = segmento"]
-    D --> H["🔔 Aviso al equipo<br/>Telegram"]
+    D --> E[" CRM<br/>Google Sheets"]
+    D --> G[" Newsletter<br/>etiqueta = segmento"]
+    D --> H[" Aviso al equipo<br/>Telegram"]
     E -.->|48 h sin contacto| I["⏰ Recordatorio<br/>automático"]
 ```
 
 ---
 
-## ⚡ Probarlo en 2 minutos
+## Probarlo en 2 minutos
 
 ```bash
 pip install pytest
@@ -86,7 +86,7 @@ docker restart club_stem_n8n
 
 ---
 
-### 🔍 El detalle que más cuesta ver
+### El detalle que más cuesta ver
 
 La lógica vive **dos veces**: en Python (para poder probarla) y en el nodo Code de n8n (para que corra en el flujo). Dos copias que se desincronizan en silencio son una bomba de tiempo, así que hay un test que **ejecuta el código del nodo fuera de n8n** y compara lead por lead contra la implementación Python.
 
@@ -94,7 +94,7 @@ Ese test ya evitó un bug real: `D'Angelo` salía como `D'angelo` solo en JavaSc
 
 ---
 
-## 📁 Estructura
+## Estructura
 
 ```
 ├── src/flujo_leads.py           # la lógica, una función por nodo
@@ -110,7 +110,7 @@ Ese test ya evitó un bug real: `D'Angelo` salía como `D'angelo` solo en JavaSc
 
 ---
 
-## 🌿 Flujo de trabajo con Git
+## Flujo de trabajo con Git
 
 El repositorio sigue **Git Flow**: `main` siempre desplegable, `develop` como
 integración, y una rama por cambio. Los merges son `--no-ff` para que cada
@@ -155,7 +155,7 @@ cuerpo, no solo el qué.
 
 ---
 
-## 📚 Documentación
+## Documentación
 
 | Documento | Contenido |
 | --- | --- |
@@ -164,7 +164,7 @@ cuerpo, no solo el qué.
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 [MIT](LICENSE) · Daniel Yataco Blas
 
