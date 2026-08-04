@@ -63,8 +63,7 @@ def main():
 
     CRM_OUT.parent.mkdir(parents=True, exist_ok=True)
     with CRM_OUT.open("w", newline="", encoding="utf-8") as f:
-        wr = csv.DictWriter(f, fieldnames=list(crm[0].keys(, lineterminator="
-")))
+        wr = csv.DictWriter(f, fieldnames=list(crm[0].keys()))
         wr.writeheader()
         wr.writerows(crm)
     with LOG_OUT.open("w", encoding="utf-8") as f:
