@@ -10,7 +10,7 @@ automáticamente con la lista de newsletter"*.
 
 ---
 
-## 🎬 Qué hace (en una imagen)
+## Qué hace (en una imagen)
 
 ```
 Formulario web / Podium
@@ -35,7 +35,7 @@ Formulario web / Podium
 
 ---
 
-## ⚡ Probarlo en 2 minutos (sin instalar n8n)
+## Probarlo en 2 minutos (sin instalar n8n)
 
 ```bash
 pip install pytest                     # única dependencia
@@ -67,7 +67,7 @@ funciona en **modo simulado** (misma lógica en JS) sin levantar nada.
 
 ---
 
-## 🐳 Probarlo con n8n de verdad (gratis, local)
+## Probarlo con n8n de verdad (gratis, local)
 
 ```bash
 docker compose up -d                   # levanta n8n en http://localhost:5678
@@ -104,7 +104,7 @@ nombre | email | telefono | mensaje | canal | fecha | segmento | estado
 
 ---
 
-## 🧪 Cómo está probado (lo que lo hace confiable)
+## Cómo está probado (lo que lo hace confiable)
 
 | Área | Qué se verifica |
 | --- | --- |
@@ -126,7 +126,7 @@ python -m pytest tests/ -v
 
 ---
 
-## 📁 Estructura
+## Estructura
 
 ```
 01_flujo_leads_n8n/
@@ -148,7 +148,7 @@ python -m pytest tests/ -v
 
 ---
 
-## 🔐 Decisiones de diseño
+## Decisiones de diseño
 
 - **Ningún dato real**: la data ficticia se genera con semilla fija (`seed=42`),
   es reproducible y no contiene información de personas reales.
@@ -163,7 +163,7 @@ python -m pytest tests/ -v
 
 ---
 
-## 📌 Estado
+## Estado
 
-✅ **Funcional y probado en local.** Workflows importables, 33 tests en verde,
+ **Funcional y probado en local.** Workflows importables, 33 tests en verde,
 data ficticia incluida. Listo para conectar credenciales reales del Club.

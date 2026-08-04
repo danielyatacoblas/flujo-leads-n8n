@@ -127,7 +127,7 @@ def construir_acciones(lead: dict, segmento: str) -> dict:
         "newsletter": {"email": lead["email"], "tag": segmento,
                        "accion": "suscribir" if lead["email"] else "omitir"},
         "email_bienvenida": _BIENVENIDA[segmento].format(nombre=lead["nombre"].split()[0]),
-        "notificacion_equipo": (f"🔔 Nuevo lead [{segmento}] {lead['nombre']} "
+        "notificacion_equipo": (f" Nuevo lead [{segmento}] {lead['nombre']} "
                                 f"({lead['canal']}) — {lead['email'] or lead['telefono']}"),
     }
 
