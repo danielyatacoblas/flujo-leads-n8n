@@ -291,15 +291,15 @@ function simular(d){
 }
 
 /* ── Toast ───────────────────────────────────────────────────── */
-const TIPO = {nuevo:'ok', duplicado:'warn', invalido:'err'};
+const TIPO = {nuevo:'ok', duplicado:'warn', invalido:'err', 'sin enviar':'warn'};
 const TITULO = {nuevo:'Lead registrado', duplicado:'Lead duplicado', invalido:'Lead descartado'};
 
-function toast(resultado, detalle, n){
+function toast(resultado, detalle, n, titulo){
   const cont = document.getElementById('toasts');
   const el = document.createElement('div');
   el.className = 'toast ' + (TIPO[resultado] || 'ok');
   el.innerHTML = `<span class="barra"></span>
-    <div><div class="toast-tit">${TITULO[resultado] || 'Enviado'}</div>
+    <div><div class="toast-tit">${titulo || TITULO[resultado] || 'Enviado'}</div>
     <div class="toast-sub">${detalle}</div></div>
     <span class="toast-n">#${n}</span>`;
   cont.appendChild(el);
@@ -391,7 +391,62 @@ document.getElementById('btnPrueba').onclick = () => {
 
 document.getElementById('form').addEventListener('submit', async (e)=>{
   e.preventDefault();
-  const btn = document.getElementById('btn');
+  /* Traduce el fallo a una instrucción concreta.
+
+   Detalle importante: n8n NO pone cabeceras CORS en sus respuestas de error, así
+   que el navegador bloquea el 404 antes de que podamos leerlo y fetch revienta
+   con un genérico "Failed to fetch". Por eso el diagnóstico se apoya en qué
+   ruta se estaba usando, no en el código de estado. */
+function problema(estado, cuerpo, destino, n){
+  const esPrueba = destino.includes('/webhook-test/');
+  const bloqueado = estado === 0 || estado === 404;
+  let titulo, aviso, detalle;
+
+  if(esPrueba && bloqueado){
+    titulo = 'n8n no está escuchando todavía';
+    aviso  = 'Pulsa Execute workflow en n8n';
+    detalle = `La ruta de prueba solo existe <b>después</b> de pulsar
+      <b>Execute workflow</b>, y acepta <b>un solo envío</b>.
+      <ol>
+        <li>Abre el workflow en <a href="http://localhost:5678" target="_blank"
+            rel="noopener">localhost:5678</a></li>
+        <li>Pulsa <b>Execute workflow</b>, abajo al centro del lienzo</li>
+        <li>Vuelve aquí y envía otra vez</li>
+      </ol>
+      Para encadenar varios envíos sin mirar el lienzo, pulsa
+      <b>«Usar el n8n local»</b>: esa ruta está siempre disponible.`;
+  } else if(bloqueado){
+    titulo = 'El webhook no respondió';
+    aviso  = 'Revisa n8n';
+    detalle = `Suele ser una de dos cosas:
+      <ol>
+        <li>n8n no está corriendo — <code>docker ps</code> debería listar
+            <code>club_stem_n8n</code></li>
+        <li>el workflow está apagado — abre el lienzo y enciende el interruptor
+            <b>Active</b>, arriba a la derecha</li>
+      </ol>
+      La ruta de producción correcta es
+      <code>http://localhost:5678/webhook/lead-demo</code>.`;
+  } else {
+    titulo = `n8n devolvió un error ${estado}`;
+    aviso  = `Error ${estado}`;
+    detalle = cuerpo && (cuerpo.message || cuerpo.hint)
+      ? `${cuerpo.message || ''}${cuerpo.hint ? '<br>' + cuerpo.hint : ''}`
+      : 'Respuesta inesperada del webhook.';
+  }
+
+  const el = document.getElementById('res');
+  el.className = 'res visible warn';
+  el.innerHTML = `<div class="res-cab"><span class="insignia">atención</span>
+    <span class="res-tit">${titulo}</span>
+    <span class="fuente">envío #${n}</span></div>
+    <div class="res-detalle">${detalle}</div>`;
+  el.classList.remove('destacar'); void el.offsetWidth; el.classList.add('destacar');
+  toast('sin enviar', aviso, n, titulo);
+  alHistorial(n, 'sin enviar', aviso);
+}
+
+const btn = document.getElementById('btn');
   btn.disabled = true; btn.textContent = 'Enviando…';
 
   const datos = Object.fromEntries(new FormData(e.target).entries());
@@ -406,17 +461,20 @@ document.getElementById('form').addEventListener('submit', async (e)=>{
     try {
       const resp = await fetch(destino, {method:'POST',
         headers:{'Content-Type':'application/json'}, body:JSON.stringify(datos)});
-      const data = await resp.json();
-      r = Array.isArray(data) ? data[0] : data;
+      const data = await resp.json().catch(() => null);
+      const cuerpo = Array.isArray(data) ? data[0] : data;
+
+      // n8n contesta el 404 con un JSON perfectamente válido, así que fetch no
+      // lanza nada: hay que mirar el estado y la forma de la respuesta.
+      if(!resp.ok || !cuerpo || !cuerpo.resultado){
+        problema(resp.status, cuerpo, destino, numEnvio);
+        btn.disabled = false; btn.textContent = 'Enviar';
+        return;
+      }
+      r = cuerpo;
       simulado = false;
     } catch(err){
-      const el = document.getElementById('res');
-      el.className = 'res visible err';
-      el.innerHTML = `<div class="res-cab"><span class="insignia">error</span>
-        <span class="res-tit">No se pudo contactar el webhook</span></div>
-        <div class="res-detalle">${err.message}<br>¿Está n8n corriendo y el
-        workflow activo?</div>`;
-      toast('invalido', 'No respondió el webhook', numEnvio);
+      problema(0, {message: err.message}, destino, numEnvio);
       btn.disabled = false; btn.textContent = 'Enviar';
       return;
     }
