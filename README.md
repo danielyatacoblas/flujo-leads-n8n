@@ -13,19 +13,11 @@
 
 ## Demo en video
 
-<!-- ────────────────────────────────────────────────────────────────────
-     ESPACIO RESERVADO PARA EL REPRODUCTOR
+https://github.com/user-attachments/assets/0d606770-8a6e-4ed7-9171-29198633e026
 
-     El archivo vive en docs/video.mp4, pero GitHub lo sirve como
-     application/octet-stream y el navegador no lo reproduce desde ahí.
-     Para incrustar el reproductor hace falta una URL de attachment:
-     arrastra el archivo a un issue nuevo, copia la URL
-     https://github.com/user-attachments/assets/... que genera, y pégala
-     sola en su propia línea aquí abajo, sustituyendo el enlace de descarga.
-     ──────────────────────────────────────────────────────────────────── -->
-
-[Descargar la grabación](docs/video.mp4) (3,3 MB) · el lead entra por el
-formulario, n8n lo valida, lo clasifica por segmento y responde.
+<p align="center"><i>Un lead entra por el formulario, n8n lo valida, lo
+clasifica por segmento y responde. La copia del archivo está en
+<a href="docs/video.mp4">docs/video.mp4</a>.</i></p>
 
 ---
 
