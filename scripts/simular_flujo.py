@@ -73,7 +73,7 @@ def main():
     print("=== Simulación del flujo de leads (local, data ficticia) ===\n")
     print(f"Leads recibidos:   {len(crudos)}")
     print(f"  ✓ nuevos:        {stats['nuevo']}")
-    print(f"  ↻ duplicados:    {stats['duplicado']}  (no se re-registran ni re-suscriben)")
+    print(f"  = duplicados:    {stats['duplicado']}  (no se re-registran ni re-suscriben)")
     print(f"  ✗ inválidos:     {stats['invalido']}  (sin contacto utilizable)")
     print("\nPor segmento (nuevos):")
     for seg in ("talleres", "voluntariado", "donacion", "general"):

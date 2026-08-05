@@ -19,7 +19,7 @@ Formulario web / Podium
    ┌─────────────────── n8n ───────────────────┐
    │ 1. Normalizar   nombre, email, tel +51    │
    │ 2. Validar      ¿contacto utilizable?     │──✗──► descartado (con motivo)
-   │ 3. Deduplicar   ¿ya existe en el CRM?     │──↻──► duplicado (no re-suscribe)
+   │ 3. Deduplicar   ¿ya existe en el CRM?     │────► duplicado (no re-suscribe)
    │ 4. Segmentar    talleres/voluntariado/    │
    │                 donación/general          │
    └──────────────────┬────────────────────────┘
@@ -30,7 +30,7 @@ Formulario web / Podium
 (Sheets)   (tag=segmento) bienvenida  equipo (Telegram)
                       │
                       ▼
-        ⏰ 48 h sin contacto → recordatorio automático
+        48 h sin contacto → recordatorio automático
 ```
 
 ---
@@ -49,7 +49,7 @@ Salida real de `simular_flujo.py`:
 ```
 Leads recibidos:   44
   ✓ nuevos:        40
-  ↻ duplicados:    2   (no se re-registran ni re-suscriben)
+  duplicados:    2   (no se re-registran ni re-suscriben)
   ✗ inválidos:     2   (sin contacto utilizable)
 
 Por segmento (nuevos):
