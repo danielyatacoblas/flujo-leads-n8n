@@ -39,18 +39,18 @@ Cada consulta que llega por la web o por Podium se copiaba a mano a una hoja de 
 
 ```mermaid
 flowchart TD
-    F[" Formulario web / Podium"] -->|webhook| N
+    F["Formulario web / Podium"] -->|webhook| N
     subgraph N ["n8n"]
         A["Normalizar<br/>teléfono y nombre"] --> B{"¿Datos<br/>utilizables?"}
-        B -->|no| X[" Descartado<br/>con motivo"]
+        B -->|no| X["Descartado<br/>con motivo"]
         B -->|sí| C{"¿Ya existe<br/>en el CRM?"}
-        C -->|sí| Y["↻ Duplicado<br/>no se re-suscribe"]
+        C -->|sí| Y["Duplicado<br/>no se re-suscribe"]
         C -->|no| D["Segmentar por<br/>palabras clave"]
     end
-    D --> E[" CRM<br/>Google Sheets"]
-    D --> G[" Newsletter<br/>etiqueta = segmento"]
-    D --> H[" Aviso al equipo<br/>Telegram"]
-    E -.->|48 h sin contacto| I["⏰ Recordatorio<br/>automático"]
+    D --> E["CRM<br/>Google Sheets"]
+    D --> G["Newsletter<br/>etiqueta = segmento"]
+    D --> H["Aviso al equipo<br/>Telegram"]
+    E -.->|48 h sin contacto| I["Recordatorio<br/>automático"]
 ```
 
 ---

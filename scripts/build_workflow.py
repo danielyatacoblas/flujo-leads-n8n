@@ -212,7 +212,7 @@ def build_prod(js: str) -> dict:
         _node("tg-2", "Equipo · Recordatorio de seguimiento", "n8n-nodes-base.telegram", 1.2,
               [400, 640],
               {"chatId": "REEMPLAZAR_CHAT_ID",
-               "text": "=⏰ Lead sin contactar hace +48 h: {{ $json.nombre }} "
+               "text": "=Lead sin contactar hace +48 h: {{ $json.nombre }} "
                        "({{ $json.segmento }}) — {{ $json.email }}",
                "additionalFields": {}}),
     ]

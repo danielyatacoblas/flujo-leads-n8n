@@ -228,7 +228,7 @@
     {
       "parameters": {
         "chatId": "REEMPLAZAR_CHAT_ID",
-        "text": "=⏰ Lead sin contactar hace +48 h: {{ $json.nombre }} ({{ $json.segmento }}) — {{ $json.email }}",
+        "text": "=Lead sin contactar hace +48 h: {{ $json.nombre }} ({{ $json.segmento }}) — {{ $json.email }}",
         "additionalFields": {}
       },
       "id": "tg-2",
