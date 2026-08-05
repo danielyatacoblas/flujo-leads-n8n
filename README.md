@@ -11,31 +11,11 @@
 
 ---
 
-## Demo en video
-
-https://github.com/user-attachments/assets/0d606770-8a6e-4ed7-9171-29198633e026
-
-<p align="center"><i>Un lead entra por el formulario, n8n lo valida, lo
-clasifica por segmento y responde. La copia del archivo está en
-<a href="docs/video.mp4">docs/video.mp4</a>.</i></p>
-
----
-
-## El problema
+## Para qué existe este repositorio
 
 Cada consulta que llega por la web o por Podium se copiaba a mano a una hoja de cálculo y a la lista de correo. Se perdían leads, se duplicaban registros y nadie sabía a quién ya se había contactado.
 
-## Qué hace este proyecto
-
-1. **Limpia** el dato: el teléfono queda siempre en formato `+51#########` y el nombre bien capitalizado, venga como venga del formulario.
-2. **Descarta duplicados** por correo o por teléfono, aunque estén escritos distinto (`987-654-321` y `+51987654321` son la misma persona).
-3. **Segmenta** en talleres, voluntariado, donación o consulta general según lo que la persona escribió.
-4. **Dispara tres acciones**: registrar en el CRM, suscribir al newsletter con su etiqueta y avisar al equipo por Telegram.
-5. **Persigue el seguimiento**: si nadie contactó al lead en 48 horas, manda un recordatorio.
-
----
-
-## Cómo funciona
+**Este proyecto recibe cada consulta por webhook, la valida, detecta si ya existe, la clasifica por interés y la reparte a donde tiene que ir. Sin que nadie copie nada.**
 
 ```mermaid
 flowchart TD
@@ -52,6 +32,32 @@ flowchart TD
     D --> H["Aviso al equipo<br/>Telegram"]
     E -.->|48 h sin contacto| I["Recordatorio<br/>automático"]
 ```
+
+---
+
+## Demo en video
+
+https://github.com/user-attachments/assets/0d606770-8a6e-4ed7-9171-29198633e026
+
+<p align="center"><i>Un lead entra por el formulario, n8n lo valida, lo
+clasifica por segmento y responde. La copia del archivo está en
+<a href="docs/video.mp4">docs/video.mp4</a>.</i></p>
+
+---
+
+## Qué hace este proyecto
+
+1. **Limpia** el dato: el teléfono queda siempre en formato `+51#########` y el nombre bien capitalizado, venga como venga del formulario.
+2. **Descarta duplicados** por correo o por teléfono, aunque estén escritos distinto (`987-654-321` y `+51987654321` son la misma persona).
+3. **Segmenta** en talleres, voluntariado, donación o consulta general según lo que la persona escribió.
+4. **Dispara tres acciones**: registrar en el CRM, suscribir al newsletter con su etiqueta y avisar al equipo por Telegram.
+5. **Persigue el seguimiento**: si nadie contactó al lead en 48 horas, manda un recordatorio.
+
+---
+
+## Cómo funciona por dentro
+
+El recorrido completo está en el diagrama del principio. Estas son las piezas que lo ejecutan:
 
 ---
 
