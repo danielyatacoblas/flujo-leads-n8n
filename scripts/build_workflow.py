@@ -250,7 +250,10 @@ def main():
     for nombre, wf in (("workflow_leads_demo.json", build_demo(js)),
                        ("workflow_leads.json", build_prod(js))):
         p = OUT / nombre
-        p.write_text(json.dumps(wf, indent=2, ensure_ascii=False), encoding="utf-8")
+        # newline="\n" a propósito: en Windows Python escribiría CRLF y el
+        # archivo saldría "modificado" en cada build, aunque no cambie nada.
+        p.write_text(json.dumps(wf, indent=2, ensure_ascii=False),
+                     encoding="utf-8", newline="\n")
         print(f"✓ {p.relative_to(ROOT)} — {len(wf['nodes'])} nodos")
     print("\nImporta el DEMO en n8n (Workflows → Import from File) y actívalo:")
     print("  funciona sin ninguna credencial.")
